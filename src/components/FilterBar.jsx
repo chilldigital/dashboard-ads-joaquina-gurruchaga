@@ -11,11 +11,6 @@ const presets = [
   { value: "this_year", label: "Este año" },
 ];
 
-const statusOptions = [
-  { value: "all", label: "Todos" },
-  { value: "active", label: "Activos" },
-  { value: "inactive", label: "Inactivos" },
-];
 
 /**
  * Props:
@@ -37,8 +32,6 @@ export default function FilterBar({
   timezones = [],
   selectedTimezone,
   onChangeTimezone,
-  selectedStatus = "all",
-  onChangeStatus,
 }) {
   const [local, setLocal] = useState(value);
 
@@ -69,23 +62,6 @@ export default function FilterBar({
         ))}
       </select>
 
-      {/* Filtro por estado */}
-      {onChangeStatus && (
-        <>
-          <label className="sr-only" htmlFor="status">Estado</label>
-          <select
-            id="status"
-            aria-label="Filtrar por estado"
-            value={selectedStatus}
-            onChange={(e) => onChangeStatus(e.target.value)}
-            className="px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {statusOptions.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
-        </>
-      )}
 
       {accounts.length > 0 && onChangeAccount && (
         <>

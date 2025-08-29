@@ -9,7 +9,6 @@ import useDateFilter from "../hooks/useDateFilter";
 const Dashboard = () => {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("all");
   const { range, setRange, humanLabel } = useDateFilter();
 
   const load = async () => {
@@ -42,11 +41,6 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range.preset]);
 
-  const adsFiltered = ads.filter((ad) => {
-    if (status === "active") return String(ad.status || "").toUpperCase() === "ACTIVE";
-    if (status === "inactive") return String(ad.status || "").toUpperCase() !== "ACTIVE";
-    return true; // all
-  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,8 +54,6 @@ const Dashboard = () => {
           <FilterBar
             value={range}
             onChange={setRange}
-            selectedStatus={status}
-            onChangeStatus={setStatus}
           />
         </div>
 
@@ -69,8 +61,8 @@ const Dashboard = () => {
           <div className="h-40 grid place-items-center text-gray-500">Cargando datos…</div>
         ) : (
           <>
-            <SummaryMetrics ads={adsFiltered} />
-            <MetricsGrid ads={adsFiltered} />
+            <SummaryMetrics ads={ads} />
+            <MetricsGrid ads={ads} />
           </>
         )}
       </main>
