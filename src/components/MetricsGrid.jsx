@@ -1,3 +1,4 @@
+// src/components/MetricsGrid.jsx
 import AdCard from "./AdCard";
 
 const MetricsGrid = ({ ads }) => {

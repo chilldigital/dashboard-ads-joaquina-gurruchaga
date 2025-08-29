@@ -4,6 +4,7 @@ import axios from "axios";
 const API_KEY = process.env.REACT_APP_WINDSOR_API_KEY;
 const DEFAULT_ACCOUNT = (process.env.REACT_APP_WINDSOR_ACCOUNT || "").trim();
 const DEFAULT_TZ = (process.env.REACT_APP_WINDSOR_TIMEZONE || "America/Buenos_Aires").trim();
+const DEFAULT_SOURCE = (process.env.REACT_APP_WINDSOR_SOURCE || "").trim();
 
 /* ---------------------------------- Utils --------------------------------- */
 // Fecha en zona horaria (solo partes Y-M-D)
@@ -132,7 +133,7 @@ export async function getAdsData({
   to = null,
   account = DEFAULT_ACCOUNT,
   timezone = DEFAULT_TZ,
-  source = "", // opcional: "facebook", "google_ads", etc.
+  source = DEFAULT_SOURCE, // opcional: "facebook", "google_ads", etc.
 } = {}) {
   const baseURL = "https://connectors.windsor.ai/all";
   const params = new URLSearchParams({
@@ -170,8 +171,6 @@ export async function getAdsData({
   if (timezone) params.append("timezone", timezone);
 
   const url = `${baseURL}?${params.toString()}`;
-  // console.debug("→ Windsor URL", url);
-
   const res = await axios.get(url);
   const payload = res?.data?.data ?? res?.data;
   return Array.isArray(payload) ? payload : [];
