@@ -45,11 +45,11 @@ const AdCard = ({ ad }) => {
       </div>
 
       <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-medium text-gray-800 text-sm truncate">
+        <div className="flex items-center gap-3 mb-2">
+          <h3 className="flex-1 min-w-0 font-medium text-gray-800 text-sm truncate">
             {ad.ad_name}
           </h3>
-          <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">
+          <span className="flex-shrink-0 whitespace-nowrap px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">
             ROAS {roas == null ? "-" : roas.toFixed(2)}
           </span>
         </div>
