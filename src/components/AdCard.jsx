@@ -16,7 +16,10 @@ const AdCard = ({ ad }) => {
           maximumFractionDigits: 2,
         })}`;
 
-  const isOn = String(ad.status || "").toUpperCase() === "ACTIVE";
+  const adActive = String(ad.status || "").toUpperCase() === "ACTIVE";
+  const campStatus = String(ad.campaign_status || "").toUpperCase();
+  const campaignActive = campStatus ? campStatus === "ACTIVE" : true;
+  const isOn = adActive && campaignActive;
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">

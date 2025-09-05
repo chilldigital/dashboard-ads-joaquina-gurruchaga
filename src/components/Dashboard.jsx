@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const { range, setRange, humanLabel } = useDateFilter();
+  const [statusFilter, setStatusFilter] = useState("all"); // all | on | off
 
   const load = async () => {
     try {
@@ -41,6 +42,20 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range.preset]);
 
+  const filteredAds = (() => {
+    if (!Array.isArray(ads)) return [];
+    if (statusFilter === "all") return ads;
+    const isActive = (a) => {
+      const adActive = String(a?.status || "").toUpperCase() === "ACTIVE";
+      const campStatus = String(a?.campaign_status || "").toUpperCase();
+      const campaignActive = campStatus ? campStatus === "ACTIVE" : true; // si no viene, asumir activo
+      return adActive && campaignActive;
+    };
+    if (statusFilter === "on") return ads.filter(isActive);
+    if (statusFilter === "off") return ads.filter((a) => !isActive(a));
+    return ads;
+  })();
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,6 +69,8 @@ const Dashboard = () => {
           <FilterBar
             value={range}
             onChange={setRange}
+            selectedStatus={statusFilter}
+            onChangeStatus={setStatusFilter}
           />
         </div>
 
@@ -61,8 +78,8 @@ const Dashboard = () => {
           <div className="h-40 grid place-items-center text-gray-500">Cargando datos…</div>
         ) : (
           <>
-            <SummaryMetrics ads={ads} />
-            <MetricsGrid ads={ads} />
+            <SummaryMetrics ads={filteredAds} />
+            <MetricsGrid ads={filteredAds} />
           </>
         )}
       </main>
