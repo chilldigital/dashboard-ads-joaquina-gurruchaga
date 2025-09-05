@@ -13,7 +13,7 @@ const FIELDS = [
   "campaign",
   "campaign_status",
   "totalcost",
-  "actions_offsite_conversion_fb_pixel_purchase",
+  "actions_omni_purchase",
   "action_values_omni_purchase",
   "status",
   "thumbnail_url",

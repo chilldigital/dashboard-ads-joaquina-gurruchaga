@@ -3,7 +3,7 @@ import StatCard from "./StatCard";
 const SummaryMetrics = ({ ads }) => {
   const spend = ads.reduce((a, x) => a + (parseFloat(x.totalcost) || 0), 0);
   const revenue = ads.reduce((a, x) => a + (parseFloat(x.action_values_omni_purchase) || 0), 0);
-  const purchases = ads.reduce((a, x) => a + (parseFloat(x.actions_offsite_conversion_fb_pixel_purchase) || 0), 0);
+  const purchases = ads.reduce((a, x) => a + (parseFloat(x.actions_omni_purchase) || 0), 0);
 
   const cpa = purchases > 0 ? spend / purchases : null;
   const roas = spend > 0 ? revenue / spend : null;

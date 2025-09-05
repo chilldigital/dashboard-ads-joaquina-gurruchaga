@@ -13,8 +13,8 @@ const MetricsGrid = ({ ads }) => {
   // Orden por mayor cantidad de compras
   const sorted = [...list].sort(
     (a, b) =>
-      (parseFloat(b.actions_offsite_conversion_fb_pixel_purchase) || 0) -
-      (parseFloat(a.actions_offsite_conversion_fb_pixel_purchase) || 0)
+      (parseFloat(b.actions_omni_purchase) || 0) -
+      (parseFloat(a.actions_omni_purchase) || 0)
   );
 
   return (

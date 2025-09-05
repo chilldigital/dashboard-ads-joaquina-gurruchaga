@@ -1,6 +1,6 @@
 // src/components/AdCard.jsx
 const AdCard = ({ ad }) => {
-  const compras = parseFloat(ad.actions_offsite_conversion_fb_pixel_purchase) || 0;
+  const compras = parseFloat(ad.actions_omni_purchase) || 0;
   const revenue = parseFloat(ad.action_values_omni_purchase) || 0;
   const gasto = parseFloat(ad.totalcost) || 0;
 
