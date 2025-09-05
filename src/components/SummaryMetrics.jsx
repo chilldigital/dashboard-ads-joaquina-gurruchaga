@@ -13,7 +13,7 @@ const SummaryMetrics = ({ ads }) => {
     `$${(n ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 mb-8 mt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-3 sm:gap-4 mb-8 mt-6">
       <StatCard icon="💸" label="Inversión" value={money(spend)} />
       <StatCard icon="🛒" label="Compras" value={purchases.toLocaleString("en-US")} />
       <StatCard icon="📉" label="CPA" value={cpa == null ? "-" : money(cpa)} />

@@ -63,8 +63,10 @@ const Dashboard = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-[11px] uppercase tracking-wide text-gray-400">Curveez</p>
-            <h1 className="text-2xl font-semibold tracking-tight">Performance de Anuncios</h1>
-            <p className="text-xs text-gray-500 mt-1">{humanLabel}</p>
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-gray-900">Performance de Anuncios</h1>
+            <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 text-[11px] rounded-full border border-gray-200 bg-white/70 text-gray-600">
+              {humanLabel}
+            </span>
           </div>
           <FilterBar
             value={range}

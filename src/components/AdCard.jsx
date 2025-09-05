@@ -22,10 +22,10 @@ const AdCard = ({ ad }) => {
   const isOn = adActive && campaignActive;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
       {/* Media + Status badge */}
       <div className="relative">
-        <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full border border-gray-200 bg-white shadow-sm select-none">
+        <span className="absolute top-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded-full border border-gray-200 bg-white select-none">
           <span
             className={`h-2 w-2 rounded-full ${
               isOn ? "bg-emerald-500" : "bg-gray-400"
@@ -49,16 +49,16 @@ const AdCard = ({ ad }) => {
 
       <div className="p-4">
         <div className="flex items-center gap-3 mb-2">
-          <h3 className="flex-1 min-w-0 font-medium text-gray-800 text-sm truncate">
+          <h3 className="flex-1 min-w-0 font-medium text-gray-900 text-sm truncate">
             {ad.ad_name}
           </h3>
-          <span className="flex-shrink-0 whitespace-nowrap px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">
+          <span className="flex-shrink-0 whitespace-nowrap px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
             ROAS {roas == null ? "-" : roas.toFixed(2)}
           </span>
         </div>
         <p className="text-xs text-gray-500 mb-3">{ad.campaign}</p>
 
-        <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+        <div className="flex flex-wrap gap-4 text-sm text-gray-800">
           <span>💸 {money(gasto)}</span>
           <span>🛒 {compras}</span>
           <span>📉 {money(cpa)}</span>

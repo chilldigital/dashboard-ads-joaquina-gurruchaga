@@ -50,24 +50,19 @@ export default function FilterBar({
     onChange(next);
   };
 
-  const SelectShell = ({ id, aria, value, onChange, children, leading }) => (
+  const SelectShell = ({ id, aria, value, onChange, children }) => (
     <div className="relative">
-      {leading && (
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-          {leading}
-        </span>
-      )}
       <select
         id={id}
         aria-label={aria}
         value={value}
         onChange={onChange}
         className={[
-          "appearance-none h-10 pl-9 pr-9 rounded-xl",
-          "border border-gray-200 bg-white/80 shadow-sm",
+          "appearance-none h-10 pl-3 pr-9 rounded-xl",
+          "border border-gray-200 bg-white",
           "text-sm text-gray-700",
           "hover:border-gray-300",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+          "focus:outline-none focus:ring-2 focus:ring-indigo-200/30 focus:border-indigo-200",
           "transition-colors",
         ].join(" ")}
       >
@@ -84,17 +79,7 @@ export default function FilterBar({
     </div>
   );
 
-  const CalendarIcon = (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M7 2a1 1 0 011 1v1h8V3a1 1 0 112 0v1h1a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 112 0v1zm13 7H4v9a1 1 0 001 1h14a1 1 0 001-1V9zM4 7h16V6a1 1 0 00-1-1h-1v1a1 1 0 11-2 0V5H8v1a1 1 0 11-2 0V5H5a1 1 0 00-1 1v1z"/>
-    </svg>
-  );
-  const PowerIcon = (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M11 2a1 1 0 012 0v10a1 1 0 11-2 0V2z"/>
-      <path d="M7.05 5.05a7 7 0 119.9 9.9 1 1 0 11-1.41-1.41 5 5 0 10-7.07 0 1 1 0 11-1.41 1.41 7 7 0 010-9.9z"/>
-    </svg>
-  );
+  // (Se quitaron íconos para un estilo más flat)
 
   return (
     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -104,7 +89,6 @@ export default function FilterBar({
         aria="Seleccionar período"
         value={local.preset}
         onChange={handlePreset}
-        leading={CalendarIcon}
       >
         {presets.map((p) => (
           <option key={p.value} value={p.value}>{p.label}</option>
@@ -113,18 +97,48 @@ export default function FilterBar({
 
       {onChangeStatus && (
         <>
-          <label className="sr-only" htmlFor="status">Estado</label>
-          <SelectShell
-            id="status"
-            aria="Filtrar por estado"
-            value={selectedStatus ?? "all"}
-            onChange={(e) => onChangeStatus(e.target.value)}
-            leading={PowerIcon}
+          <span className="sr-only" id="status-label">Estado</span>
+          <div
+            role="group"
+            aria-labelledby="status-label"
+            className="inline-flex items-center rounded-xl border border-gray-200 bg-white overflow-hidden"
           >
-            <option value="all">Todos</option>
-            <option value="on">ON</option>
-            <option value="off">OFF</option>
-          </SelectShell>
+            {[
+              { key: "all", label: "Todos" },
+              { key: "on", label: "Activos" },
+              { key: "off", label: "Pausados" },
+            ].map((opt, i) => {
+              const active = (selectedStatus ?? "all") === opt.key;
+              const base = "px-4 h-10 text-sm text-center justify-center min-w-[84px] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/30 transition-colors inline-flex items-center";
+              const shape =
+                i === 0
+                  ? "rounded-l-xl"
+                  : i === 2
+                  ? "-ml-px rounded-r-xl"
+                  : "-ml-px";
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => onChangeStatus(opt.key)}
+                  className={[
+                    base,
+                    shape,
+                    active
+                      ? "bg-indigo-50 text-indigo-500 border border-transparent"
+                      : "bg-transparent text-gray-700 border border-transparent hover:bg-gray-50",
+                  ].join(" ")}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    {opt.key === "on" && <span className="h-2 w-2 rounded-full bg-emerald-500" />}
+                    {opt.key === "off" && <span className="h-2 w-2 rounded-full bg-gray-300" />}
+                    {opt.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </>
       )}
 
