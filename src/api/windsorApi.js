@@ -6,104 +6,29 @@ const DEFAULT_ACCOUNT = (process.env.REACT_APP_WINDSOR_ACCOUNT || "").trim();
 const DEFAULT_TZ = (process.env.REACT_APP_WINDSOR_TIMEZONE || "America/Buenos_Aires").trim();
 const DEFAULT_SOURCE = (process.env.REACT_APP_WINDSOR_SOURCE || "").trim();
 
-/* ---------------------------------- Utils --------------------------------- */
-// Fecha en zona horaria (solo partes Y-M-D)
-function tzParts(date, timeZone) {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  // en-CA -> YYYY-MM-DD
-  const [y, m, d] = fmt.format(date).split("-");
-  return { y: Number(y), m: Number(m), d: Number(d) };
-}
-function toISO({ y, m, d }) {
-  const mm = String(m).padStart(2, "0");
-  const dd = String(d).padStart(2, "0");
-  return `${y}-${mm}-${dd}`;
-}
-function addDaysInTz(baseDate, days, timeZone) {
-  const ms = baseDate.getTime() + days * 86400000;
-  const d = new Date(ms);
-  return tzParts(d, timeZone);
-}
-function firstDayOfMonthInTz(baseDate, timeZone) {
-  const { y, m } = tzParts(baseDate, timeZone);
-  return { y, m, d: 1 };
-}
-function lastDayOfPrevMonthInTz(baseDate, timeZone) {
-  const { y, m } = tzParts(baseDate, timeZone);
-  const prevY = m === 1 ? y - 1 : y;
-  const prevM = m === 1 ? 12 : m - 1;
-  // día 0 del mes actual = último día del mes anterior
-  const d = new Date(Date.UTC(y, m - 1, 1)); // primer día mes actual (UTC)
-  const prev = new Date(d.getTime() - 86400000);
-  const parts = tzParts(prev, timeZone);
-  return { y: prevY, m: prevM, d: parts.d };
-}
-function firstDayOfPrevMonthInTz(baseDate, timeZone) {
-  const { y, m } = tzParts(baseDate, timeZone);
-  const prevY = m === 1 ? y - 1 : y;
-  const prevM = m === 1 ? 12 : m - 1;
-  return { y: prevY, m: prevM, d: 1 };
-}
-function firstDayOfYearInTz(baseDate, timeZone) {
-  const { y } = tzParts(baseDate, timeZone);
-  return { y, m: 1, d: 1 };
-}
+/* --------------------------------- Fields --------------------------------- */
+const FIELDS = [
+  "ad_id",
+  "ad_name",
+  "campaign",
+  "campaign_status",
+  "totalcost",
+  "actions_omni_purchase",
+  "action_values_omni_purchase",
+  "status",
+  "thumbnail_url",
+];
 
-function rangeForPreset(preset, timeZone) {
-  const now = new Date();
-  const today = tzParts(now, timeZone);
-
-  const TODAY = { from: today, to: today };
-  const YESTERDAY = {
-    from: addDaysInTz(now, -1, timeZone),
-    to: addDaysInTz(now, -1, timeZone),
-  };
-  const LAST_7D = {
-    from: addDaysInTz(now, -6, timeZone),
-    to: today,
-  };
-  const LAST_14D = {
-    from: addDaysInTz(now, -13, timeZone),
-    to: today,
-  };
-  const LAST_30D = {
-    from: addDaysInTz(now, -29, timeZone),
-    to: today,
-  };
-  const THIS_MONTH = {
-    from: firstDayOfMonthInTz(now, timeZone),
-    to: today,
-  };
-  const LAST_MONTH = {
-    from: firstDayOfPrevMonthInTz(now, timeZone),
-    to: lastDayOfPrevMonthInTz(now, timeZone),
-  };
-  const THIS_YEAR = {
-    from: firstDayOfYearInTz(now, timeZone),
-    to: today,
-  };
-
+/* --------------------------- Date helpers (TZ) ---------------------------- */
+function normalizeTimezone(tz) {
   const map = {
-    today: TODAY,
-    ayer: YESTERDAY, // alias por si enviamos algo en español
-    yesterday: YESTERDAY,
-    last_7d: LAST_7D,
-    last_14d: LAST_14D,
-    last_30d: LAST_30D,
-    this_month: THIS_MONTH,
-    last_month: LAST_MONTH,
-    this_year: THIS_YEAR,
+    AST: "America/Puerto_Rico",
+    "Atlantic Standard Time": "America/Puerto_Rico",
   };
-
-  return map[preset] || THIS_MONTH;
+  return map[tz] || tz;
 }
 
-// Helper to get today's date in YYYY-MM-DD format for a given timezone
+// Devuelve YYYY-MM-DD para la fecha actual en la zona horaria dada
 function tzTodayISO(timeZone) {
   const fmt = new Intl.DateTimeFormat("en-CA", {
     timeZone,
@@ -111,20 +36,8 @@ function tzTodayISO(timeZone) {
     month: "2-digit",
     day: "2-digit",
   });
-  return fmt.format(new Date()); // YYYY-MM-DD
+  return fmt.format(new Date());
 }
-
-/* --------------------------------- Fields --------------------------------- */
-const FIELDS = [
-  "ad_id",
-  "ad_name",
-  "campaign",
-  "totalcost",
-  "actions_offsite_conversion_fb_pixel_purchase",
-  "action_values_omni_purchase",
-  "status",
-  "thumbnail_url",
-];
 
 /* ----------------------------------- API ---------------------------------- */
 export async function getAdsData({
@@ -141,26 +54,30 @@ export async function getAdsData({
     fields: FIELDS.join(","),
   });
 
-  // 👇 Preferimos presets para alinear con la plataforma, con mapeos específicos
-  const tz = timezone || DEFAULT_TZ;
+  // Usar presets nativos de Windsor; mapear aliases comunes
   const preset = (datePreset || "").trim();
+  const alias = {
+    yesterday: "last_1d",
+    last_month: "last_1m",
+    // today: "today", // si Windsor no lo soporta, considerar fallback a from/to
+  };
 
-  if (preset) {
-    if (preset === "today") {
-      const today = tzTodayISO(tz);
-      params.append("date_from", today);
-      params.append("date_to", today);
-    } else if (preset === "yesterday") {
-      params.append("date_preset", "last_1d");
-    } else if (preset === "last_month") {
-      params.append("date_preset", "last_1m");
-    } else {
-      params.append("date_preset", preset);
-    }
-  } else if (from && to) {
-    // Fallback: rango custom solo si NO hay preset
+  const tzNorm = normalizeTimezone(timezone || DEFAULT_TZ);
+
+  if (preset === "today") {
+    // Requisito: Windsor espera today como rango explícito (from/to del día)
+    const today = tzTodayISO(tzNorm);
+    params.append("date_from", today);
+    params.append("date_to", today);
+  } else if (preset && preset !== "custom") {
+    params.append("date_preset", alias[preset] || preset);
+  } else if (preset === "custom" && from && to) {
+    // Rango custom sin transformaciones locales (passthrough)
     params.append("date_from", from);
     params.append("date_to", to);
+  } else {
+    // Valor por defecto
+    params.append("date_preset", "this_month");
   }
 
   // Forzar cuenta
@@ -168,9 +85,18 @@ export async function getAdsData({
   // Opcional: filtrar por fuente
   if (source) params.append("source", source);
   // Timezone (para que Windsor entienda el rango correctamente)
-  if (timezone) params.append("timezone", timezone);
+  if (tzNorm) params.append("timezone", tzNorm);
 
   const url = `${baseURL}?${params.toString()}`;
+  if (String(process.env.REACT_APP_DEBUG_WINDSOR).toLowerCase() === "true") {
+    // Log the final URL (without api key) for debugging
+    try {
+      const safe = new URL(url);
+      safe.searchParams.set("api_key", "***");
+      // eslint-disable-next-line no-console
+      console.debug("Windsor URL:", safe.toString());
+    } catch {}
+  }
   const res = await axios.get(url);
   const payload = res?.data?.data ?? res?.data;
   return Array.isArray(payload) ? payload : [];

@@ -26,6 +26,9 @@ const presets = [
 export default function FilterBar({
   value,
   onChange,
+  // Estado ON/OFF
+  selectedStatus,
+  onChangeStatus,
   accounts = [],
   selectedAccount,
   onChangeAccount,
@@ -47,56 +50,129 @@ export default function FilterBar({
     onChange(next);
   };
 
-  return (
-    <div className="flex flex-wrap items-center gap-3">
-      <label className="sr-only" htmlFor="preset">Período</label>
+  const SelectShell = ({ id, aria, value, onChange, children }) => (
+    <div className="relative">
       <select
+        id={id}
+        aria-label={aria}
+        value={value}
+        onChange={onChange}
+        className={[
+          "appearance-none h-10 pl-3 pr-9 rounded-xl",
+          "border border-gray-200 bg-white",
+          "text-sm text-gray-700",
+          "hover:border-gray-300",
+          "focus:outline-none focus:ring-2 focus:ring-indigo-200/30 focus:border-indigo-200",
+          "transition-colors",
+        ].join(" ")}
+      >
+        {children}
+      </select>
+      <svg
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.08z" clipRule="evenodd" />
+      </svg>
+    </div>
+  );
+
+  // (Se quitaron íconos para un estilo más flat)
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+      <label className="sr-only" htmlFor="preset">Período</label>
+      <SelectShell
         id="preset"
-        aria-label="Seleccionar período"
+        aria="Seleccionar período"
         value={local.preset}
         onChange={handlePreset}
-        className="px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         {presets.map((p) => (
           <option key={p.value} value={p.value}>{p.label}</option>
         ))}
-      </select>
+      </SelectShell>
 
+      {onChangeStatus && (
+        <>
+          <span className="sr-only" id="status-label">Estado</span>
+          <div
+            role="group"
+            aria-labelledby="status-label"
+            className="inline-flex items-center rounded-xl border border-gray-200 bg-white overflow-hidden"
+          >
+            {[
+              { key: "all", label: "Todos" },
+              { key: "on", label: "Activos" },
+              { key: "off", label: "Pausados" },
+            ].map((opt, i) => {
+              const active = (selectedStatus ?? "all") === opt.key;
+              const base = "px-4 h-10 text-sm text-center justify-center min-w-[84px] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/30 transition-colors inline-flex items-center";
+              const shape =
+                i === 0
+                  ? "rounded-l-xl"
+                  : i === 2
+                  ? "-ml-px rounded-r-xl"
+                  : "-ml-px";
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => onChangeStatus(opt.key)}
+                  className={[
+                    base,
+                    shape,
+                    active
+                      ? "bg-indigo-50 text-indigo-500 border border-transparent"
+                      : "bg-transparent text-gray-700 border border-transparent hover:bg-gray-50",
+                  ].join(" ")}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    {opt.key === "on" && <span className="h-2 w-2 rounded-full bg-emerald-500" />}
+                    {opt.key === "off" && <span className="h-2 w-2 rounded-full bg-gray-300" />}
+                    {opt.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       {accounts.length > 0 && onChangeAccount && (
         <>
           <label className="sr-only" htmlFor="account">Cuenta</label>
-          <select
+          <SelectShell
             id="account"
-            aria-label="Seleccionar cuenta"
+            aria="Seleccionar cuenta"
             value={selectedAccount ?? ""}
             onChange={(e) => onChangeAccount(e.target.value)}
-            className="px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {accounts.map((a) => (
               <option key={a.value} value={a.value}>{a.label}</option>
             ))}
-          </select>
+          </SelectShell>
         </>
       )}
 
       {timezones.length > 0 && onChangeTimezone && (
         <>
           <label className="sr-only" htmlFor="tz">Zona horaria</label>
-          <select
+          <SelectShell
             id="tz"
-            aria-label="Seleccionar zona horaria"
+            aria="Seleccionar zona horaria"
             value={selectedTimezone ?? ""}
             onChange={(e) => onChangeTimezone(e.target.value)}
-            className="px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {timezones.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
             ))}
-          </select>
+          </SelectShell>
         </>
       )}
-
     </div>
   );
 }

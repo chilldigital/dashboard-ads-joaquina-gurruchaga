@@ -34,6 +34,7 @@ export default function useDateFilter() {
       return `Del ${range.from} al ${range.to}`;
     }
     const map = {
+      today: "Hoy",
       yesterday: "Ayer",
       last_7d: "Últimos 7 días",
       last_14d: "Últimos 14 días",
