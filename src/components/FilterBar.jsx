@@ -51,14 +51,14 @@ export default function FilterBar({
   };
 
   const SelectShell = ({ id, aria, value, onChange, children }) => (
-    <div className="relative">
+    <div className="relative w-full sm:w-auto">
       <select
         id={id}
         aria-label={aria}
         value={value}
         onChange={onChange}
         className={[
-          "appearance-none h-10 pl-3 pr-9 rounded-xl",
+          "appearance-none h-10 pl-3 pr-9 rounded-xl w-full sm:w-auto",
           "border border-gray-200 bg-white",
           "text-sm text-gray-700",
           "hover:border-gray-300",
@@ -82,18 +82,20 @@ export default function FilterBar({
   // (Se quitaron íconos para un estilo más flat)
 
   return (
-    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+    <div className="flex flex-col w-full gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
       <label className="sr-only" htmlFor="preset">Período</label>
-      <SelectShell
-        id="preset"
-        aria="Seleccionar período"
-        value={local.preset}
-        onChange={handlePreset}
-      >
-        {presets.map((p) => (
-          <option key={p.value} value={p.value}>{p.label}</option>
-        ))}
-      </SelectShell>
+      <div className="w-full sm:w-auto">
+        <SelectShell
+          id="preset"
+          aria="Seleccionar período"
+          value={local.preset}
+          onChange={handlePreset}
+        >
+          {presets.map((p) => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </SelectShell>
+      </div>
 
       {onChangeStatus && (
         <>
@@ -101,7 +103,7 @@ export default function FilterBar({
           <div
             role="group"
             aria-labelledby="status-label"
-            className="inline-flex items-center rounded-xl border border-gray-200 bg-white overflow-hidden"
+            className="flex w-full sm:inline-flex items-center rounded-xl border border-gray-200 bg-white overflow-hidden"
           >
             {[
               { key: "all", label: "Todos" },
@@ -109,13 +111,13 @@ export default function FilterBar({
               { key: "off", label: "Pausados" },
             ].map((opt, i) => {
               const active = (selectedStatus ?? "all") === opt.key;
-              const base = "px-4 h-10 text-sm text-center justify-center min-w-[84px] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/30 transition-colors inline-flex items-center";
+              const base = "px-4 h-10 text-sm text-center justify-center min-w-0 flex-1 sm:flex-none sm:min-w-[84px] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/30 transition-colors inline-flex items-center";
               const shape =
                 i === 0
                   ? "rounded-l-xl"
                   : i === 2
-                  ? "-ml-px rounded-r-xl"
-                  : "-ml-px";
+                  ? "sm:-ml-px rounded-r-xl"
+                  : "sm:-ml-px";
               return (
                 <button
                   key={opt.key}
@@ -145,33 +147,37 @@ export default function FilterBar({
       {accounts.length > 0 && onChangeAccount && (
         <>
           <label className="sr-only" htmlFor="account">Cuenta</label>
-          <SelectShell
-            id="account"
-            aria="Seleccionar cuenta"
-            value={selectedAccount ?? ""}
-            onChange={(e) => onChangeAccount(e.target.value)}
-          >
-            {accounts.map((a) => (
-              <option key={a.value} value={a.value}>{a.label}</option>
-            ))}
-          </SelectShell>
+          <div className="w-full sm:w-auto">
+            <SelectShell
+              id="account"
+              aria="Seleccionar cuenta"
+              value={selectedAccount ?? ""}
+              onChange={(e) => onChangeAccount(e.target.value)}
+            >
+              {accounts.map((a) => (
+                <option key={a.value} value={a.value}>{a.label}</option>
+              ))}
+            </SelectShell>
+          </div>
         </>
       )}
 
       {timezones.length > 0 && onChangeTimezone && (
         <>
           <label className="sr-only" htmlFor="tz">Zona horaria</label>
-          <SelectShell
-            id="tz"
-            aria="Seleccionar zona horaria"
-            value={selectedTimezone ?? ""}
-            onChange={(e) => onChangeTimezone(e.target.value)}
-          >
-            {timezones.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
-            ))}
-          </SelectShell>
-        </>
+          <div className="w-full sm:w-auto">
+            <SelectShell
+              id="tz"
+              aria="Seleccionar zona horaria"
+              value={selectedTimezone ?? ""}
+              onChange={(e) => onChangeTimezone(e.target.value)}
+            >
+              {timezones.map((t) => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </SelectShell>
+          </div>
+      </>
       )}
     </div>
   );
