@@ -51,14 +51,14 @@ export default function FilterBar({
   };
 
   const SelectShell = ({ id, aria, value, onChange, children }) => (
-    <div className="relative w-full sm:w-auto">
+    <div className="relative w-full md:w-auto">
       <select
         id={id}
         aria-label={aria}
         value={value}
         onChange={onChange}
         className={[
-          "appearance-none h-10 pl-3 pr-9 rounded-xl w-full sm:w-auto",
+          "appearance-none h-10 pl-3 pr-9 rounded-xl w-full md:w-auto",
           "border border-gray-200 bg-white",
           "text-sm text-gray-700",
           "hover:border-gray-300",
@@ -82,9 +82,9 @@ export default function FilterBar({
   // (Se quitaron íconos para un estilo más flat)
 
   return (
-    <div className="flex flex-col w-full gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+    <div className="flex flex-col w-full gap-3 md:w-auto md:flex-row md:flex-nowrap md:items-center md:gap-3">
       <label className="sr-only" htmlFor="preset">Período</label>
-      <div className="w-full sm:w-auto">
+      <div className="w-full md:w-auto">
         <SelectShell
           id="preset"
           aria="Seleccionar período"
@@ -103,7 +103,7 @@ export default function FilterBar({
           <div
             role="group"
             aria-labelledby="status-label"
-            className="flex w-full sm:inline-flex items-center rounded-xl border border-gray-200 bg-white overflow-hidden"
+            className="flex w-full md:inline-flex items-center rounded-xl border border-gray-200 bg-white overflow-hidden"
           >
             {[
               { key: "all", label: "Todos" },
@@ -111,13 +111,13 @@ export default function FilterBar({
               { key: "off", label: "Pausados" },
             ].map((opt, i) => {
               const active = (selectedStatus ?? "all") === opt.key;
-              const base = "px-4 h-10 text-sm text-center justify-center min-w-0 flex-1 sm:flex-none sm:min-w-[84px] focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/30 transition-colors inline-flex items-center";
+              const base = "px-4 h-10 text-sm text-center justify-center min-w-0 flex-1 md:flex-none md:w-28 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300/30 transition-colors inline-flex items-center";
               const shape =
                 i === 0
                   ? "rounded-l-xl"
                   : i === 2
-                  ? "sm:-ml-px rounded-r-xl"
-                  : "sm:-ml-px";
+                  ? "md:-ml-px rounded-r-xl"
+                  : "md:-ml-px";
               return (
                 <button
                   key={opt.key}
@@ -147,7 +147,7 @@ export default function FilterBar({
       {accounts.length > 0 && onChangeAccount && (
         <>
           <label className="sr-only" htmlFor="account">Cuenta</label>
-          <div className="w-full sm:w-auto">
+          <div className="w-full md:w-auto">
             <SelectShell
               id="account"
               aria="Seleccionar cuenta"
@@ -165,7 +165,7 @@ export default function FilterBar({
       {timezones.length > 0 && onChangeTimezone && (
         <>
           <label className="sr-only" htmlFor="tz">Zona horaria</label>
-          <div className="w-full sm:w-auto">
+          <div className="w-full md:w-auto">
             <SelectShell
               id="tz"
               aria="Seleccionar zona horaria"
