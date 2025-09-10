@@ -16,10 +16,20 @@ const AdCard = ({ ad }) => {
           maximumFractionDigits: 2,
         })}`;
 
-  const adActive = String(ad.status || "").toUpperCase() === "ACTIVE";
+  // Normalizar y determinar el estado del anuncio
+  const adStatus = String(ad.status || "").toUpperCase();
   const campStatus = String(ad.campaign_status || "").toUpperCase();
-  const campaignActive = campStatus ? campStatus === "ACTIVE" : true;
-  const isOn = adActive && campaignActive;
+  const adsetStatus = String(ad.adset_status || "").toUpperCase();
+  
+  // Imprimir valores de depuración
+  
+  
+  // Un anuncio está activo solo si los tres estados son "ACTIVE"
+  // Si campaign_status o adset_status están vacíos, asumimos que están activos
+  const isOn = 
+    adStatus === "ACTIVE" && 
+    (campStatus === "ACTIVE" || campStatus === "") &&
+    (adsetStatus === "ACTIVE" || adsetStatus === "");
 
   return (
     <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">

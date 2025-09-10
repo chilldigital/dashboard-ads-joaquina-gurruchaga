@@ -9,8 +9,10 @@ const DEFAULT_SOURCE = (process.env.REACT_APP_WINDSOR_SOURCE || "").trim();
 /* --------------------------------- Fields --------------------------------- */
 const FIELDS = [
   "ad_name",
+  "ad_id",
   "campaign",
   "campaign_status",
+  "adset_status",
   "totalcost",
   "actions_omni_purchase",
   "action_values_omni_purchase",
@@ -55,9 +57,13 @@ export async function getAdsData({
 
   // Usar presets nativos de Windsor; mapear aliases comunes
   const preset = (datePreset || "").trim();
+  // NO usamos alias para los presets, enviamos tal cual a la API
+  // excepto para los casos específicos que necesitan traducción
   const alias = {
     yesterday: "last_1d",
     last_month: "last_1m",
+    // No incluimos last_30d, last_7d, etc. para usar el valor original
+    // ya que Windsor los acepta directamente
     // today: "today", // si Windsor no lo soporta, considerar fallback a from/to
   };
 
