@@ -1,5 +1,65 @@
-// src/api/windsorApi.js
 import axios from "axios";
+
+// --- NUEVA FUNCIÓN PARA KPIs CONSOLIDADOS (SummaryMetrics) ---
+export async function getSummaryKpis({
+  datePreset = "this_month",
+  from = null,
+  to = null,
+  account = DEFAULT_ACCOUNT,
+  timezone = DEFAULT_TZ,
+  source = DEFAULT_SOURCE,
+} = {}) {
+  const baseURL = "https://connectors.windsor.ai/all";
+  const KPI_FIELDS = [
+    "totalcost",
+    "actions_omni_purchase",
+    "action_values_offsite_conversion_fb_pixel_purchase",
+  ];
+  const params = new URLSearchParams({
+    api_key: API_KEY,
+    fields: KPI_FIELDS.join(","),
+  });
+
+  // Lógica de fechas igual que en getAdsData
+  const preset = (datePreset || "").trim();
+  const alias = {
+    yesterday: "last_1d",
+    last_month: "last_1m",
+  };
+  const tzNorm = normalizeTimezone(timezone || DEFAULT_TZ);
+
+  if (preset === "today") {
+    const today = tzTodayISO(tzNorm);
+    params.append("date_from", today);
+    params.append("date_to", today);
+  } else if (preset && preset !== "custom") {
+    params.append("date_preset", alias[preset] || preset);
+  } else if (preset === "custom" && from && to) {
+    params.append("date_from", from);
+    params.append("date_to", to);
+  } else {
+    params.append("date_preset", "this_month");
+  }
+
+  if (account) params.append("select_accounts", account);
+  if (source) params.append("source", source);
+  if (tzNorm) params.append("timezone", tzNorm);
+
+  const url = `${baseURL}?${params.toString()}`;
+  if (String(process.env.REACT_APP_DEBUG_WINDSOR).toLowerCase() === "true") {
+    try {
+      const safe = new URL(url);
+      safe.searchParams.set("api_key", "***");
+      // eslint-disable-next-line no-console
+      console.debug("Windsor KPI URL:", safe.toString());
+    } catch {}
+  }
+  const res = await axios.get(url);
+  const payload = res?.data?.data ?? res?.data;
+  // Si la respuesta es un array con un solo objeto, devolver ese objeto
+  return Array.isArray(payload) && payload.length === 1 ? payload[0] : payload;
+}
+
 
 const API_KEY = process.env.REACT_APP_WINDSOR_API_KEY;
 const DEFAULT_ACCOUNT = (process.env.REACT_APP_WINDSOR_ACCOUNT || "").trim();
