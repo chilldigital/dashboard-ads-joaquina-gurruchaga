@@ -8,7 +8,6 @@ const DEFAULT_SOURCE = (process.env.REACT_APP_WINDSOR_SOURCE || "").trim();
 
 /* --------------------------------- Fields --------------------------------- */
 const FIELDS = [
-  "ad_id",
   "ad_name",
   "campaign",
   "campaign_status",

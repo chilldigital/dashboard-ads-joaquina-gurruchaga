@@ -20,7 +20,7 @@ const MetricsGrid = ({ ads }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {sorted.map((ad) => (
-        <AdCard key={ad.ad_id} ad={ad} />
+        <AdCard key={ad.ad_name} ad={ad} />
       ))}
     </div>
   );
