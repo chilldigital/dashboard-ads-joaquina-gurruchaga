@@ -10,152 +10,76 @@ const Dashboard = () => {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const { range, setRange, humanLabel } = useDateFilter();
-  const [statusFilter, setStatusFilter] = useState("all"); // all | on | off
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
+  // Carga de datos
   const load = async () => {
     try {
       setLoading(true);
-      const args = { datePreset: range.preset }; // usamos presets siempre
-
-      
-      
-      const data = await getAdsData({
-        ...args,
-        // account: process.env.REACT_APP_WINDSOR_ACCOUNT,
-        // timezone: "America/Buenos_Aires",
-      });
-      
-      // Verificar que los datos tengan la estructura esperada
-      if (Array.isArray(data) && data.length > 0) {
-        
-        
-        // Análisis de los estados presentes en los datos
-        const statusAnalysis = {
-          total: data.length,
-          withStatus: data.filter(ad => ad.hasOwnProperty('status')).length,
-          withCampaignStatus: data.filter(ad => ad.hasOwnProperty('campaign_status')).length,
-          withAdsetStatus: data.filter(ad => ad.hasOwnProperty('adset_status')).length,
-          activeStatus: data.filter(ad => String(ad?.status || "").toUpperCase() === "ACTIVE").length,
-          pausedStatus: data.filter(ad => String(ad?.status || "").toUpperCase() === "PAUSED").length,
-          otherStatusValues: [...new Set(data.map(ad => String(ad?.status || "").toUpperCase()).filter(s => s !== "ACTIVE" && s !== "PAUSED" && s !== ""))],
-        };
-        
-        // Muestra de datos para verificar estructura
-        if (data.length > 0) {
-          // ...
-        }
-      } else {
-        console.warn("⚠️ No se recibieron datos o el formato es incorrecto");
-      }
-      
-      setAds(data);
+      const args = { datePreset: range.preset };
+      const data = await getAdsData({ ...args });
+      setAds(Array.isArray(data) ? data : []);
     } catch (e) {
-      console.error("❌ Error cargando datos:", e);
+      console.error("Error cargando datos", e);
     } finally {
       setLoading(false);
     }
   };
 
-  // carga inicial
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { load(); setStatusFilter("all"); /* eslint-disable-next-line */ }, [range.preset]);
 
-  // recarga al cambiar preset
-  useEffect(() => {
-    load();
-    // Resetear el filtro de estado al cambiar el preset para evitar inconsistencias
-    setStatusFilter("all");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [range.preset]);
-
-  // Implementación mejorada del filtrado
-  const filteredAds = (() => {
-    // Añadir log para depurar
-    
-    
-    if (!Array.isArray(ads)) return [];
-    if (statusFilter === "all") return ads;
-    
-    // Verificar estructura de datos para depuración
-    if (ads.length > 0) {
-      
-    }
-    
-    // Función simplificada para verificar el estado activo - solo ACTIVE o PAUSED
-    const checkStatus = (a) => {
-      // Normalizar status para manejar cualquier formato
-      const adStatus = String(a?.status || "").toUpperCase();
-      const campStatus = String(a?.campaign_status || "").toUpperCase();
-      const adsetStatus = String(a?.adset_status || "").toUpperCase();
-      
-      // Un anuncio está activo solo si los tres estados son "ACTIVE"
-      // Un anuncio está pausado si cualquiera de los tres estados es "PAUSED"
-      const isActive = 
-        adStatus === "ACTIVE" && 
-        campStatus === "ACTIVE" && 
-        adsetStatus === "ACTIVE";
-      
-      return {
-        adStatus,
-        campStatus,
-        adsetStatus,
-        isActive
-      };
-    };
-
-    // Aplicar filtro según el estado seleccionado - misma lógica para todos los períodos
-    let result;
-    if (statusFilter === "on") {
-      // Lógica unificada para todos los períodos
-      result = ads.filter(ad => {
-        const adStatus = String(ad?.status || "").toUpperCase();
-        const campStatus = String(ad?.campaign_status || "").toUpperCase();
-        const adsetStatus = String(ad?.adset_status || "").toUpperCase();
-        
-        // Para debug
-        
-        
-        return adStatus === "ACTIVE" && campStatus === "ACTIVE" && adsetStatus === "ACTIVE";
-      });
-      
-      
-      
-      // Log de muestra para depuración
-      if (result.length > 0) {
-        
+  // Agrupa anuncios por ad_id, ad_name, campaign_id y adset_id, sumando métricas relevantes
+  function groupAds(list) {
+    const grouped = [];
+    const groupMap = new Map();
+    list.forEach(ad => {
+      const key = `${ad.ad_id}_${ad.ad_name}_${ad.campaign_id || ''}_${ad.adset_id || ''}`;
+      if (!groupMap.has(key)) {
+        groupMap.set(key, { ...ad });
+      } else {
+        const existing = groupMap.get(key);
+        const sumFields = [
+          'spend',
+          'actions_omni_purchase',
+          'revenue',
+          'impressions',
+          'clicks',
+          'cpm',
+          'cpc',
+          'ctr',
+          'roas',
+          'cpa',
+        ];
+        sumFields.forEach(field => {
+          if (ad[field] !== undefined && !isNaN(parseFloat(ad[field]))) {
+            existing[field] = (parseFloat(existing[field]) || 0) + parseFloat(ad[field]);
+          }
+        });
       }
-    }
-    else if (statusFilter === "off") {
-      // Lógica unificada para todos los períodos
-      result = ads.filter(ad => {
-        const adStatus = String(ad?.status || "").toUpperCase();
-        const campStatus = String(ad?.campaign_status || "").toUpperCase();
-        const adsetStatus = String(ad?.adset_status || "").toUpperCase();
-        
-        return adStatus === "PAUSED" || campStatus === "PAUSED" || adsetStatus === "PAUSED";
-      });
-      
-      
-      
-      // Log de muestra para depuración
-      if (result.length > 0) {
-        
-      }
-      
-      // Log de muestra para depuración
-      if (result.length > 0) {
-        
-      }
-    }
-    else {
-      result = ads;
-    }
-    
-    return result;
-  })();
+    });
+    groupMap.forEach(ad => grouped.push(ad));
+    return grouped;
+  }
 
+    const normalize = str => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const groupedAds = groupAds(ads).filter(ad => {
+    if (!search) return true;
+    const adName = normalize(ad.ad_name || "");
+    const campaignName = normalize(ad.campaign_name || "");
+    return adName.includes(search) || campaignName.includes(search);
+  });
+
+  const filteredAds = groupedAds.filter(ad => {
+    if (statusFilter === "all") return true;
+    const adStatus = String(ad?.status || "").toUpperCase();
+    const campStatus = String(ad?.campaign_status || "").toUpperCase();
+    const adsetStatus = String(ad?.adset_status || "").toUpperCase();
+    if (statusFilter === "on") return adStatus === "ACTIVE" && campStatus === "ACTIVE" && adsetStatus === "ACTIVE";
+    if (statusFilter === "off") return adStatus === "PAUSED" || campStatus === "PAUSED" || adsetStatus === "PAUSED";
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -173,6 +97,7 @@ const Dashboard = () => {
             onChange={setRange}
             selectedStatus={statusFilter}
             onChangeStatus={setStatusFilter}
+            onSearch={setSearch}
           />
         </div>
 
