@@ -1,25 +1,32 @@
 // src/components/Dashboard.jsx
 import { useEffect, useState } from "react";
-import { getAdsData } from "../api/windsorApi";
+import { getAdsData, getSummaryKpis } from "../api/windsorApi";
 import SummaryMetrics from "./SummaryMetrics";
 import MetricsGrid from "./MetricsGrid";
 import FilterBar from "./FilterBar";
 import useDateFilter from "../hooks/useDateFilter";
 
+
 const Dashboard = () => {
   const [ads, setAds] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const { range, setRange, humanLabel } = useDateFilter();
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
 
-  // Carga de datos
+
+  // Carga de datos de anuncios y KPIs
   const load = async () => {
     try {
       setLoading(true);
       const args = { datePreset: range.preset };
-      const data = await getAdsData({ ...args });
-      setAds(Array.isArray(data) ? data : []);
+      const [adsData, summaryData] = await Promise.all([
+        getAdsData({ ...args }),
+        getSummaryKpis({ ...args }),
+      ]);
+      setAds(Array.isArray(adsData) ? adsData : []);
+      setSummary(summaryData || null);
     } catch (e) {
       console.error("Error cargando datos", e);
     } finally {
@@ -105,7 +112,7 @@ const Dashboard = () => {
           <div className="h-40 grid place-items-center text-gray-500">Cargando datos…</div>
         ) : (
           <>
-            <SummaryMetrics ads={filteredAds} />
+            <SummaryMetrics summary={summary} />
             <MetricsGrid ads={filteredAds} />
           </>
         )}
