@@ -82,7 +82,7 @@ export default function FilterBar({
     <div className="flex flex-col w-full gap-3 md:w-auto md:flex-row md:flex-nowrap md:items-center md:gap-3">
       <input
         type="text"
-        placeholder="Buscar anuncio o campaña..."
+        placeholder="Buscar anuncio"
         value={search}
         onChange={(e) => {
           const val = e.target.value;
