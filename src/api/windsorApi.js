@@ -83,15 +83,15 @@ const FIELDS = [
 /* --------------------------- Date helpers (TZ) ---------------------------- */
 function normalizeTimezone(tz) {
   const map = {
-    AST: "America/Puerto_Rico",
-    "Atlantic Standard Time": "America/Puerto_Rico",
+    AST: "America/Buenos_Aires",
+    "Atlantic Standard Time": "America/Buenos_Aires",
   };
   return map[tz] || tz;
 }
 
 // Devuelve YYYY-MM-DD para la fecha actual en la zona horaria dada
 function tzTodayISO(timeZone) {
-  const fmt = new Intl.DateTimeFormat("en-CA", {
+  const fmt = new Intl.DateTimeFormat("es-AR", {
     timeZone,
     year: "numeric",
     month: "2-digit",

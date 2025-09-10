@@ -8,13 +8,9 @@ const AdCard = ({ ad }) => {
   const roas = gasto > 0 ? revenue / gasto : null;
   const ticket = compras > 0 ? revenue / compras : null;
 
+  // Redondea a entero y agrega separador de miles
   const money = (n) =>
-    n == null
-      ? "-"
-      : `$${n.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`;
+    n == null ? "-" : `$${Math.round(n).toLocaleString("es-AR")}`;
 
   // Normalizar y determinar el estado del anuncio
   const adStatus = String(ad.status || "").toUpperCase();
