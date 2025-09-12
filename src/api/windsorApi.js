@@ -91,13 +91,18 @@ function normalizeTimezone(tz) {
 
 // Devuelve YYYY-MM-DD para la fecha actual en la zona horaria dada
 function tzTodayISO(timeZone) {
-  const fmt = new Intl.DateTimeFormat("es-AR", {
+  // Obtener la fecha local en la zona horaria especificada y formatear YYYY-MM-DD
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  return fmt.format(new Date());
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const yyyy = parts.find(p => p.type === 'year').value;
+  const mm = parts.find(p => p.type === 'month').value;
+  const dd = parts.find(p => p.type === 'day').value;
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 /* ----------------------------------- API ---------------------------------- */
