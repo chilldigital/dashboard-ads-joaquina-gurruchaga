@@ -8,7 +8,7 @@ const Navbar = () => {
             📊
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-wide text-gray-400">CURVEEZ</p>
+            <p className="text-[11px] uppercase tracking-wide text-gray-400">Joaquina Gurruchaga</p>
             <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Performance de Anuncios</h1>
           </div>
         </div>
