@@ -1,4 +1,3 @@
-
 import StatCard from "./StatCard";
 
 const SummaryMetrics = ({ summary }) => {
@@ -18,13 +17,13 @@ const SummaryMetrics = ({ summary }) => {
 
   return (
     <div className="w-full px-2 sm:px-0">
-      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 md:gap-4 mb-8 mt-6">
+  <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4 mb-8 mt-6">
         <StatCard icon="💸" label="Inversión" value={money(spend)} />
         <StatCard icon="🛒" label="Compras" value={purchases.toLocaleString("en-US")}/>
         <StatCard icon="📉" label="CPA" value={cpa == null ? "-" : money(cpa)} />
         <StatCard icon="💰" label="Revenue" value={money(revenue)} />
         <StatCard icon="🚀" label="ROAS" value={roas == null ? "-" : roas.toFixed(2)} />
-        <StatCard icon="🎯" label="Ticket Promedio" value={ticket == null ? "-" : money(ticket)} />
+  {/* <StatCard icon="🎯" label="Ticket Promedio" value={ticket == null ? "-" : money(ticket)} /> */}
       </div>
     </div>
   );
